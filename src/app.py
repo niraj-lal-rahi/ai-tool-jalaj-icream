@@ -7,7 +7,7 @@ from typing import Dict, List
 
 from .adaptive_learning import AdaptiveLearner
 from .ocr_engine import OcrEngine
-from .parser import parse_lines
+from .parser import extract_seller_name, parse_lines
 
 
 def run_pipeline(image_path: str, output_path: str, db_path: str) -> List[Dict[str, float | str]]:
@@ -17,6 +17,7 @@ def run_pipeline(image_path: str, output_path: str, db_path: str) -> List[Dict[s
     try:
         lines = ocr.extract_lines(image_path)
         items = parse_lines(lines)
+        seller_name = extract_seller_name(lines)
 
         for item in items:
             corrected = learner.suggest_correction(item.name)
@@ -25,6 +26,7 @@ def run_pipeline(image_path: str, output_path: str, db_path: str) -> List[Dict[s
 
         rows = [
             {
+                "seller_name": seller_name or "",
                 "item": i.name,
                 "sold_qty": i.sold_qty,
                 "returned_qty": i.returned_qty,
@@ -41,7 +43,7 @@ def run_pipeline(image_path: str, output_path: str, db_path: str) -> List[Dict[s
         with open(output_path, "w", newline="", encoding="utf-8") as f:
             writer = csv.DictWriter(
                 f,
-                fieldnames=["item", "sold_qty", "returned_qty", "unit_price", "net_qty", "net_value"],
+                fieldnames=["seller_name", "item", "sold_qty", "returned_qty", "unit_price", "net_qty", "net_value"],
             )
             writer.writeheader()
             for row in rows:

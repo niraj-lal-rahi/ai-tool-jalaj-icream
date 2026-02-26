@@ -1,8 +1,9 @@
 # Handwritten Sales Sheet AI Tool (Python)
 
 This project is a practical starter for an **AI-assisted handwritten sheet reader** that:
-- Reads text from a handwritten image.
-- Extracts item sales data (`sold`, `returned`, `price`).
+- Reads text from a handwritten image (English + Hindi/Devanagari).
+- Detects seller/shop name from top heading.
+- Extracts item sales data (`sold`, `returned`, `price`) including handwritten arithmetic like `20+100`.
 - Calculates net quantity and net sales value.
 - **Learns from user corrections** and adapts over time.
 
@@ -22,10 +23,12 @@ Python is the preferred language here because it has the best ecosystem for OCR,
 Use one line per item, such as:
 - `Milk, 10, 2, 40`
 - `Bread sold 5 returned 1 price 25`
+- `चना, २०+१०, ५, ४०`
+- `चना बेचा १० वापस २ भाव ५०`
 
 Meaning:
-- Item name
-- Quantity sold
+- Item/product name
+- Quantity sold (can be an expression)
 - Quantity returned
 - Unit price
 
@@ -53,6 +56,7 @@ python -m src.app feedback --observed milkk --corrected Milk --confidence 0.9
 Future runs can auto-correct similar names.
 
 ## Output columns
+- `seller_name`
 - `item`
 - `sold_qty`
 - `returned_qty`
@@ -64,3 +68,9 @@ Future runs can auto-correct similar names.
 - For better handwritten accuracy, collect sample sheets and fine-tune detection/parsing.
 - Add human-in-the-loop review UI for row-by-row correction.
 - Consider model upgrades (TrOCR/Donut) if sheets are complex.
+
+
+## Handwriting adaptation workflow
+1. Run on your sheet image.
+2. If OCR misreads an item/seller token, submit correction via `feedback`.
+3. The SQLite learner stores the correction and applies similar matches in future runs, improving recognition for your handwriting style over time.

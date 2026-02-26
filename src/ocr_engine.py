@@ -5,7 +5,7 @@ from typing import List
 
 class OcrEngine:
     def __init__(self, languages: list[str] | None = None) -> None:
-        self.languages = languages or ["en"]
+        self.languages = languages or ["en", "hi"]
 
         try:
             import easyocr  # type: ignore
